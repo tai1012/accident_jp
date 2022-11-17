@@ -7,7 +7,7 @@ from decimal import Decimal, ROUND_HALF_UP
 
 
 from pandas.io import gbq
-import geopandas
+import geopandas as gpd
 from shapely.geometry import Point, LineString, Polygon
 import geopatra
 import folium
@@ -82,7 +82,7 @@ data['datetime'] = pd.to_datetime({'year':data['発生日時　　年'],
                                 })
 data = data.sort_values('datetime').reset_index()
 data = data.drop(['index'],axis=1)
-print(data)
+# print(data)
 # print(data.columns)
 # print(data)
 # print(data[data['発生日時　　年'] == 2020])
@@ -142,7 +142,7 @@ data = data.drop(['都道府県コード', '地点コード', '市区町村コ�
        '発生日時　　日', '発生日時　　時', '発生日時　　分', '年齢（当事者A）', '年齢（当事者B）',], axis=1)
 
 ## コードの説明変数を加える
-print(data.columns)
+# print(data.columns)
 
 # 事故内容
 data['accident_type'] = np.where(data['事故内容']==1, '死亡',
@@ -178,7 +178,7 @@ data = data.drop(['路線コード', 'road', 'road_1'] ,axis=1)
 
 
 # 上下線
-print(data['上下線'].value_counts())
+# print(data['上下線'].value_counts())
 data['road_updown'] = np.where(data['上下線']==1, '上',
                             np.where(data['上下線']==2, '下',
                             np.where(data['上下線']==0, '対象外', None)))                                                        
@@ -228,7 +228,7 @@ data['route_condition'] = np.where(data['路面状態']==1, '舗装－乾燥',
 data = data.drop('路面状態', axis=1) 
 
 # # 道路形状
-data['route_shaoe'] = np.where(data['道路形状']==31, '交差点－環状交差点',
+data['route_shape'] = np.where(data['道路形状']==31, '交差点－環状交差点',
                                 np.where(data['道路形状']==1,'交差点－その他',
                                 np.where(data['道路形状']==37, '交差点付近－環状交差点付近',
                                 np.where(data['道路形状']==7, '交差点付近－その他',
@@ -529,12 +529,15 @@ data = data.drop(['衝突地点', 'ゾーン規制', '中央分離帯施設等',
        '人身損傷程度（当事者B）', '曜日(発生年月日)', '祝日(発生年月日)','環状交差点の直径', '信号機', '一時停止規制　標識（当事者A）', 
        '一時停止規制　表示（当事者A）','一時停止規制　標識（当事者B）', '一時停止規制　表示（当事者B）', '車道幅員', '道路線形'], axis=1)
 
+data["death_flag"] = np.where(data["accident_type"] == "死亡", 1, 0)
+
 print(data)
 # data.to_csv('data.csv')
 print(data.columns)
 
-gdf = geopandas.GeoDataFrame(data, geometry = geopandas.points_from_xy(data.longitude, data.latitude))
-
+# gdf = gpd.GeoDataFrame(data, geometry=gpd.points_from_xy(data.longitude, data.latitude))
+# # gdf.plot()
+# print(gdf)
 
 # print(data[data.isna().any(axis=1)].sum())
 # null_data = data[data.isna().any(axis=1)]
